@@ -86,7 +86,7 @@ public class MasonryView : ContentView
         validateValue: ValidateNonNegativeSpacing,
         propertyChanged: OnLayoutParameterChanged);
 
-    private readonly Grid _rootGrid;
+    private readonly Grid _scrollContentGrid;
     private readonly ScrollView _scrollView;
     private readonly MasonryCanvas _canvas;
     private readonly ContentView _emptyViewContainer;
@@ -112,16 +112,6 @@ public class MasonryView : ContentView
             VerticalOptions = LayoutOptions.Start
         };
 
-        _scrollView = new ScrollView
-        {
-            Orientation = ScrollOrientation.Vertical,
-            HorizontalOptions = LayoutOptions.Fill,
-            VerticalOptions = LayoutOptions.Fill,
-            Content = _canvas
-        };
-        _scrollView.Scrolled += OnScrollViewScrolled;
-        _scrollView.SizeChanged += OnViewportSizeChanged;
-
         _emptyViewContainer = new ContentView
         {
             HorizontalOptions = LayoutOptions.Fill,
@@ -129,14 +119,24 @@ public class MasonryView : ContentView
             IsVisible = false
         };
 
-        _rootGrid = new Grid
+        _scrollContentGrid = new Grid
         {
             HorizontalOptions = LayoutOptions.Fill,
             VerticalOptions = LayoutOptions.Fill,
-            Children = { _scrollView, _emptyViewContainer }
+            Children = { _canvas, _emptyViewContainer }
         };
 
-        base.Content = _rootGrid;
+        _scrollView = new ScrollView
+        {
+            Orientation = ScrollOrientation.Vertical,
+            HorizontalOptions = LayoutOptions.Fill,
+            VerticalOptions = LayoutOptions.Fill,
+            Content = _scrollContentGrid
+        };
+        _scrollView.Scrolled += OnScrollViewScrolled;
+        _scrollView.SizeChanged += OnViewportSizeChanged;
+
+        base.Content = _scrollView;
         SizeChanged += OnViewportSizeChanged;
         Loaded += OnMasonryViewLoaded;
         Unloaded += OnMasonryViewUnloaded;
@@ -265,6 +265,11 @@ public class MasonryView : ContentView
         _lastViewportWidth = width;
         _lastViewportHeight = height;
         _currentScrollY = Math.Max(0, scrollY);
+
+        if (_items.Count == 0 && height > 0)
+        {
+            _emptyViewContainer.MinimumHeightRequest = height;
+        }
 
         if (widthChanged || (_currentLayout.Placements.Count != _items.Count && _items.Count > 0))
         {
@@ -647,7 +652,11 @@ public class MasonryView : ContentView
         bool hasEmptyPresentation = EmptyView is not null || EmptyViewTemplate is not null;
 
         _emptyViewContainer.IsVisible = isEmpty && hasEmptyPresentation;
-        _scrollView.IsVisible = !isEmpty || !hasEmptyPresentation;
+        _canvas.IsVisible = !isEmpty || !hasEmptyPresentation;
+        if (isEmpty && _lastViewportHeight > 0)
+        {
+            _emptyViewContainer.MinimumHeightRequest = _lastViewportHeight;
+        }
     }
 
     private sealed record RealizedSlot(View View, DataTemplate Template);

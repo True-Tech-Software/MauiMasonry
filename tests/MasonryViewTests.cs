@@ -183,4 +183,12 @@ public class MasonryViewTests
         Assert.Equal(0, view.CanvasStoredBoundsCount);
         Assert.Equal(0, view.RealizedViewCount);
     }
+
+    [Fact]
+    public void Content_IsScrollViewDirectly_ForRefreshViewCompatibility()
+    {
+        var view = new MasonryView();
+
+        Assert.IsType<ScrollView>(view.Content);
+    }
 }
