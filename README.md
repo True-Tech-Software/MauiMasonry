@@ -6,8 +6,8 @@ A lightweight, performant .NET MAUI control for building Pinterest-style stagger
 
 | Package | Target Frameworks | Description |
 | --- | --- | --- |
-| **`MauiMasonry.Core`** | `net10.0` | Pure .NET library containing `IMasonryViewItem` and `MasonryLayoutCalculator` so DTOs and ViewModels can implement item contracts without a .NET MAUI UI dependency. |
-| **`MauiMasonry`** | `net10.0` | The `.NET MAUI` `MasonryView` control with `DataTemplate` support, empty-state templates, and viewport virtualization. |
+| **`TrueTechSoftware.MauiMasonry.Core`** | `net10.0` | Pure .NET library containing `IMasonryViewItem` and `MasonryLayoutCalculator` so DTOs and ViewModels can implement item contracts without a .NET MAUI UI dependency. |
+| **`TrueTechSoftware.MauiMasonry`** | `net10.0` | The `.NET MAUI` `MasonryView` control with `DataTemplate` support, empty-state templates, and viewport virtualization. |
 
 ## Quick Start
 

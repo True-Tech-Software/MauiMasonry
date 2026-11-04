@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
-    <PackageId>MauiMasonry.Core</PackageId>
+    <PackageId>TrueTechSoftware.MauiMasonry.Core</PackageId>
     <Version>0.1.0</Version>
     <Authors>True Tech Software</Authors>
     <Company>True Tech Software</Company>
