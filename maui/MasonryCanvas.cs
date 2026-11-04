@@ -33,6 +33,20 @@ internal sealed class MasonryCanvas : Layout
     }
 
     /// <summary>
+    /// Clears all child views and their stored layout rectangles.
+    /// </summary>
+    public void Reset()
+    {
+        _boundsByView.Clear();
+        Clear();
+    }
+
+    /// <summary>
+    /// Gets the number of stored layout bounds entries (exposed for testing).
+    /// </summary>
+    internal int StoredBoundsCount => _boundsByView.Count;
+
+    /// <summary>
     /// Retrieves the currently assigned layout bounds for a realized child view, if any.
     /// </summary>
     public bool TryGetLayoutBounds(IView view, out Rect bounds) =>

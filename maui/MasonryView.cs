@@ -120,6 +120,7 @@ public class MasonryView : ContentView
             Content = _canvas
         };
         _scrollView.Scrolled += OnScrollViewScrolled;
+        _scrollView.SizeChanged += OnViewportSizeChanged;
 
         _emptyViewContainer = new ContentView
         {
@@ -136,7 +137,9 @@ public class MasonryView : ContentView
         };
 
         base.Content = _rootGrid;
-        SizeChanged += OnMasonryViewSizeChanged;
+        SizeChanged += OnViewportSizeChanged;
+        Loaded += OnMasonryViewLoaded;
+        Unloaded += OnMasonryViewUnloaded;
 
         UpdateEmptyViewContent();
         UpdateEmptyStateVisibility();
@@ -237,6 +240,22 @@ public class MasonryView : ContentView
     internal int RealizedViewCount => _realizedByIndex.Count;
 
     /// <summary>
+    /// Gets the internal canvas bounds count for testing cleanup.
+    /// </summary>
+    internal int CanvasStoredBoundsCount => _canvas.StoredBoundsCount;
+
+    /// <inheritdoc />
+    protected override void OnPropertyChanged(string? propertyName = null)
+    {
+        base.OnPropertyChanged(propertyName);
+
+        if (propertyName is nameof(Padding) or nameof(IsVisible))
+        {
+            RefreshViewportFromControlSize();
+        }
+    }
+
+    /// <summary>
     /// Updates the viewport dimensions and scroll position and recalculates layout and realized views.
     /// Exposed internally for deterministic testing without requiring a platform renderer.
     /// </summary>
@@ -317,18 +336,41 @@ public class MasonryView : ContentView
         }
     }
 
-    private void OnMasonryViewSizeChanged(object? sender, EventArgs e)
+    private void OnViewportSizeChanged(object? sender, EventArgs e)
     {
-        if (Width <= 0 || Height <= 0)
+        RefreshViewportFromControlSize();
+    }
+
+    private void RefreshViewportFromControlSize()
+    {
+        double width = _scrollView.Width > 0 ? _scrollView.Width : Width - Padding.HorizontalThickness;
+        double height = _scrollView.Height > 0 ? _scrollView.Height : Height - Padding.VerticalThickness;
+
+        if (width <= 0 || height <= 0)
         {
             return;
         }
 
-        Thickness padding = Padding;
-        double availableWidth = Math.Max(0, Width - padding.HorizontalThickness);
-        double availableHeight = Math.Max(0, Height - padding.VerticalThickness);
+        UpdateViewport(width, height, _scrollView.ScrollY);
+    }
 
-        UpdateViewport(availableWidth, availableHeight, _scrollView.ScrollY);
+    private void OnMasonryViewLoaded(object? sender, EventArgs e)
+    {
+        if (ItemsSource is INotifyCollectionChanged notifyCollection && _subscribedCollection is null)
+        {
+            _subscribedCollection = notifyCollection;
+            _subscribedCollection.CollectionChanged += OnCollectionChanged;
+            ReloadItemsFromSource();
+        }
+    }
+
+    private void OnMasonryViewUnloaded(object? sender, EventArgs e)
+    {
+        if (_subscribedCollection is not null)
+        {
+            _subscribedCollection.CollectionChanged -= OnCollectionChanged;
+            _subscribedCollection = null;
+        }
     }
 
     private void OnScrollViewScrolled(object? sender, ScrolledEventArgs e)
@@ -484,7 +526,6 @@ public class MasonryView : ContentView
                 DataTemplate resolvedTemplate = ResolveTemplate(ItemTemplate, item);
                 View view = AcquireView(resolvedTemplate);
                 view.BindingContext = item;
-                view.IsVisible = true;
 
                 _canvas.SetLayoutBounds(view, bounds);
                 if (!_canvas.Contains(view))
@@ -503,9 +544,9 @@ public class MasonryView : ContentView
         }
     }
 
-    private static DataTemplate ResolveTemplate(DataTemplate template, object item) =>
+    private DataTemplate ResolveTemplate(DataTemplate template, object item) =>
         template is DataTemplateSelector selector
-            ? selector.SelectTemplate(item, null) ?? template
+            ? selector.SelectTemplate(item, this) ?? template
             : template;
 
     private View AcquireView(DataTemplate template)
@@ -531,9 +572,9 @@ public class MasonryView : ContentView
             return;
         }
 
-        slot.View.IsVisible = false;
         slot.View.BindingContext = null;
         _canvas.ClearLayoutBounds(slot.View);
+        _canvas.Remove(slot.View);
 
         if (!_recyclePoolByTemplate.TryGetValue(slot.Template, out Stack<View>? pool))
         {
@@ -560,9 +601,9 @@ public class MasonryView : ContentView
 
     private void ClearAllRealizedAndPooledViews()
     {
-        _realizedByIndex.Clear();
+        RecycleAllRealizedViews();
         _recyclePoolByTemplate.Clear();
-        _canvas.Clear();
+        _canvas.Reset();
     }
 
     private void UpdateEmptyViewContent()

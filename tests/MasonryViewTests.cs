@@ -113,4 +113,74 @@ public class MasonryViewTests
         Assert.Empty(view.CurrentLayout.Placements);
         Assert.Equal(0, view.RealizedViewCount);
     }
+
+    private sealed class RecordingTemplateSelector : DataTemplateSelector
+    {
+        public BindableObject? LastContainer { get; private set; }
+        public DataTemplate DefaultTemplate { get; } = new(() => new Border());
+
+        protected override DataTemplate OnSelectTemplate(object item, BindableObject container)
+        {
+            LastContainer = container;
+            return DefaultTemplate;
+        }
+    }
+
+    [Fact]
+    public void DataTemplateSelector_ReceivesMasonryViewAsContainer()
+    {
+        var selector = new RecordingTemplateSelector();
+        var view = new MasonryView
+        {
+            ItemTemplate = selector,
+            ItemsSource = new[] { new SampleItem("One", 1.0) }
+        };
+
+        view.UpdateViewport(width: 210, height: 200, scrollY: 0);
+
+        Assert.Same(view, selector.LastContainer);
+    }
+
+    [Fact]
+    public void Virtualization_PreservesTemplateRootIsVisibleProperty()
+    {
+        var items = Enumerable.Range(0, 20)
+            .Select(i => new SampleItem($"Item {i}", 1.0))
+            .ToList();
+
+        Border? firstCreatedBorder = null;
+        var view = new MasonryView
+        {
+            ColumnCount = 2,
+            ItemTemplate = new DataTemplate(() =>
+            {
+                var border = new Border { IsVisible = false };
+                firstCreatedBorder ??= border;
+                return border;
+            }),
+            ItemsSource = items
+        };
+
+        view.UpdateViewport(width: 210, height: 100, scrollY: 0);
+
+        Assert.NotNull(firstCreatedBorder);
+        Assert.False(firstCreatedBorder.IsVisible);
+    }
+
+    [Fact]
+    public void ItemTemplate_Change_ClearsCanvasBoundsAndOldViews()
+    {
+        var view = new MasonryView
+        {
+            ItemTemplate = new DataTemplate(() => new Border()),
+            ItemsSource = new[] { new SampleItem("One", 1.0), new SampleItem("Two", 1.0) }
+        };
+
+        view.UpdateViewport(width: 210, height: 200, scrollY: 0);
+        Assert.Equal(2, view.CanvasStoredBoundsCount);
+
+        view.ItemTemplate = null;
+        Assert.Equal(0, view.CanvasStoredBoundsCount);
+        Assert.Equal(0, view.RealizedViewCount);
+    }
 }

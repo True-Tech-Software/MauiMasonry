@@ -5,6 +5,8 @@ namespace MauiMasonry.Core;
 /// </summary>
 public sealed class MasonryLayoutResult
 {
+    private readonly MasonryItemPlacement[][] _placementsByColumn;
+
     /// <summary>
     /// Gets an empty layout result with zero items and zero height.
     /// </summary>
@@ -25,6 +27,7 @@ public sealed class MasonryLayoutResult
         Placements = placements;
         TotalWidth = totalWidth;
         TotalHeight = totalHeight;
+        _placementsByColumn = BuildColumnIndex(placements);
     }
 
     /// <summary>
@@ -44,13 +47,14 @@ public sealed class MasonryLayoutResult
 
     /// <summary>
     /// Returns all item placements that intersect the visible viewport expanded by the specified buffer multiplier.
+    /// Uses per-column binary search so scrolling visits only the intersecting items.
     /// </summary>
     /// <param name="scrollY">The current vertical scroll offset.</param>
     /// <param name="viewportHeight">The height of the visible viewport.</param>
     /// <param name="bufferScreens">
     /// The number of viewport heights to include above and below the visible area (defaults to <c>1.0</c>).
     /// </param>
-    /// <returns>A read-only list of placements intersecting the buffered viewport.</returns>
+    /// <returns>A read-only list of placements intersecting the buffered viewport, ordered by <see cref="MasonryItemPlacement.Index"/>.</returns>
     public IReadOnlyList<MasonryItemPlacement> GetVisiblePlacements(
         double scrollY,
         double viewportHeight,
@@ -66,15 +70,88 @@ public sealed class MasonryLayoutResult
         double rangeBottom = Math.Max(rangeTop, scrollY + viewportHeight + clampedBuffer);
 
         var visible = new List<MasonryItemPlacement>();
-        for (int i = 0; i < Placements.Count; i++)
+        for (int col = 0; col < _placementsByColumn.Length; col++)
         {
-            MasonryItemPlacement placement = Placements[i];
-            if (placement.IntersectsVerticalRange(rangeTop, rangeBottom))
+            MasonryItemPlacement[] columnPlacements = _placementsByColumn[col];
+            if (columnPlacements.Length == 0)
             {
+                continue;
+            }
+
+            int startIdx = FindFirstIntersectingIndex(columnPlacements, rangeTop);
+            for (int i = startIdx; i < columnPlacements.Length; i++)
+            {
+                MasonryItemPlacement placement = columnPlacements[i];
+                if (placement.Y > rangeBottom)
+                {
+                    break;
+                }
+
                 visible.Add(placement);
             }
         }
 
+        visible.Sort(static (a, b) => a.Index.CompareTo(b.Index));
         return visible;
+    }
+
+    private static MasonryItemPlacement[][] BuildColumnIndex(IReadOnlyList<MasonryItemPlacement> placements)
+    {
+        if (placements.Count == 0)
+        {
+            return [];
+        }
+
+        int maxColumn = 0;
+        for (int i = 0; i < placements.Count; i++)
+        {
+            if (placements[i].ColumnIndex > maxColumn)
+            {
+                maxColumn = placements[i].ColumnIndex;
+            }
+        }
+
+        var buckets = new List<MasonryItemPlacement>[maxColumn + 1];
+        for (int col = 0; col <= maxColumn; col++)
+        {
+            buckets[col] = [];
+        }
+
+        for (int i = 0; i < placements.Count; i++)
+        {
+            MasonryItemPlacement placement = placements[i];
+            buckets[placement.ColumnIndex].Add(placement);
+        }
+
+        var result = new MasonryItemPlacement[maxColumn + 1][];
+        for (int col = 0; col <= maxColumn; col++)
+        {
+            result[col] = [.. buckets[col]];
+        }
+
+        return result;
+    }
+
+    private static int FindFirstIntersectingIndex(MasonryItemPlacement[] columnPlacements, double rangeTop)
+    {
+        int low = 0;
+        int high = columnPlacements.Length - 1;
+        int result = columnPlacements.Length;
+
+        while (low <= high)
+        {
+            int mid = low + ((high - low) / 2);
+            if (columnPlacements[mid].Bottom >= rangeTop)
+            {
+                result = mid;
+                high = mid - 1;
+            }
+            else
+            {
+                low = mid + 1;
+            }
+        }
+
+        return result;
     }
 }

@@ -30,12 +30,14 @@ jobs:
       - name: Determine package version
         id: version
         shell: bash
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          REF_NAME: ${{ github.ref }}
         run: |
-          if [ -n "${{ inputs.version }}" ]; then
-            VERSION="${{ inputs.version }}"
-          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-            VERSION="${{ inputs.version || '' }}"
-            VERSION="${GITHUB_REF#refs/tags/v}"
+          if [ -n "${INPUT_VERSION}" ]; then
+            VERSION="${INPUT_VERSION}"
+          elif [[ "${REF_NAME}" == refs/tags/v* ]]; then
+            VERSION="${REF_NAME#refs/tags/v}"
           else
             VERSION="0.1.0"
           fi
@@ -47,9 +49,11 @@ jobs:
           dotnet test tests/MauiMasonry.Tests.csproj --configuration Release
 
       - name: Pack MauiMasonry.Core and MauiMasonry
+        env:
+          PACKAGE_VERSION: ${{ steps.version.outputs.version }}
         run: |
-          dotnet pack core/MauiMasonry.Core.csproj --configuration Release -p:PackageVersion=${{ steps.version.outputs.version }} --output ./artifacts
-          dotnet pack maui/MauiMasonry.csproj --configuration Release -p:PackageVersion=${{ steps.version.outputs.version }} --output ./artifacts
+          dotnet pack core/MauiMasonry.Core.csproj --configuration Release "-p:PackageVersion=${PACKAGE_VERSION}" --output ./artifacts
+          dotnet pack maui/MauiMasonry.csproj --configuration Release "-p:PackageVersion=${PACKAGE_VERSION}" --output ./artifacts
 
       - name: Authenticate with NuGet Trusted Publishing
         id: nuget-auth
