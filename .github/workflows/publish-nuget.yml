@@ -96,18 +96,18 @@ jobs:
         run: |
           dotnet nuget push "./artifacts/*.nupkg" --api-key "${{ steps.nuget-auth.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
 
-      - name: Create and push git tag
+      - name: Create GitHub Release and tag
         env:
           GH_TOKEN: ${{ github.token }}
           PACKAGE_VERSION: ${{ steps.version.outputs.version }}
-          REPO: ${{ github.repository }}
           COMMIT_SHA: ${{ github.sha }}
         run: |
           TAG="v${PACKAGE_VERSION}"
-          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" > /dev/null 2>&1; then
-            echo "Tag ${TAG} already exists on origin."
+          if gh release view "${TAG}" > /dev/null 2>&1; then
+            echo "Release ${TAG} already exists."
           else
-            gh api "repos/${REPO}/git/refs" \
-              -f ref="refs/tags/${TAG}" \
-              -f sha="${COMMIT_SHA}"
+            gh release create "${TAG}" ./artifacts/*.nupkg \
+              --target "${COMMIT_SHA}" \
+              --title "${TAG}" \
+              --generate-notes
           fi
