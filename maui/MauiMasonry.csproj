@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <PackageId>MauiMasonry</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>True Tech Software</Authors>
+    <Company>True Tech Software</Company>
+    <Description>A lightweight, performant .NET MAUI control for building Pinterest-style staggered masonry grids with item virtualization.</Description>
+    <RepositoryUrl>https://github.com/True-Tech-Software/MauiMasonry</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/True-Tech-Software/MauiMasonry</PackageProjectUrl>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>maui;masonry;staggered-grid;virtualization;collectionview;android;ios</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.120" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\core\MauiMasonry.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
