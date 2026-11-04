@@ -1,0 +1,59 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version override (e.g. 0.1.0)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install .NET MAUI workloads
+        run: dotnet workload install maui-android maui-ios
+
+      - name: Determine package version
+        id: version
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION="0.1.0"
+          fi
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore and Test
+        run: |
+          dotnet restore MauiMasonry.slnx
+          dotnet test tests/MauiMasonry.Tests.csproj --configuration Release
+
+      - name: Pack MauiMasonry.Core and MauiMasonry
+        run: |
+          dotnet pack core/MauiMasonry.Core.csproj --configuration Release -p:PackageVersion=${{ steps.version.outputs.version }} --output ./artifacts
+          dotnet pack maui/MauiMasonry.csproj --configuration Release -p:PackageVersion=${{ steps.version.outputs.version }} --output ./artifacts
+
+      - name: Push to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "./artifacts/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate

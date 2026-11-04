@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <PackageId>MauiMasonry.Core</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>True Tech Software</Authors>
+    <Company>True Tech Software</Company>
+    <Description>Core contracts and deterministic layout calculation engine for MauiMasonry staggered grids.</Description>
+    <RepositoryUrl>https://github.com/True-Tech-Software/MauiMasonry</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/True-Tech-Software/MauiMasonry</PackageProjectUrl>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>maui;masonry;staggered-grid;virtualization;layout</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

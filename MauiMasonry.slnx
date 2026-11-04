@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".github/workflows/ci.yml" />
+    <File Path=".github/workflows/publish-nuget.yml" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="core/MauiMasonry.Core.csproj" />
+  <Project Path="maui/MauiMasonry.csproj" />
+  <Project Path="tests/MauiMasonry.Tests.csproj" />
+</Solution>
