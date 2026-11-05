@@ -21,7 +21,7 @@ A lightweight, performant .NET MAUI control for building Pinterest-style stagger
 ```csharp
 using MauiMasonry.Core;
 
-public class PrintableDto : IMasonryViewItem
+public class PhotoDto : IMasonryViewItem
 {
     public required string Title { get; set; }
     public string? ThumbnailUrl { get; set; }
@@ -46,7 +46,7 @@ public class PrintableDto : IMasonryViewItem
         RowSpacing="10">
 
         <masonry:MasonryView.ItemTemplate>
-            <DataTemplate x:DataType="models:PrintableDto">
+            <DataTemplate x:DataType="models:PhotoDto">
                 <Border Padding="0">
                     <Image Aspect="AspectFill" Source="{Binding ThumbnailUrl}" />
                 </Border>
