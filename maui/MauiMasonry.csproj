@@ -14,7 +14,7 @@
     <RepositoryUrl>https://github.com/True-Tech-Software/MauiMasonry</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/True-Tech-Software/MauiMasonry</PackageProjectUrl>
-    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>maui;masonry;staggered-grid;virtualization;collectionview;android;ios</PackageTags>
   </PropertyGroup>
