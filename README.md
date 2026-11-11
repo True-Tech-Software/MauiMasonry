@@ -3,7 +3,7 @@
 [![CI & Publish NuGet Packages](https://github.com/True-Tech-Software/MauiMasonry/actions/workflows/publish-nuget.yml/badge.svg)](https://github.com/True-Tech-Software/MauiMasonry/actions/workflows/publish-nuget.yml)
 [![NuGet](https://img.shields.io/nuget/v/TrueTechSoftware.MauiMasonry.svg?label=TrueTechSoftware.MauiMasonry)](https://www.nuget.org/packages/TrueTechSoftware.MauiMasonry)
 [![NuGet Core](https://img.shields.io/nuget/v/TrueTechSoftware.MauiMasonry.Core.svg?label=TrueTechSoftware.MauiMasonry.Core)](https://www.nuget.org/packages/TrueTechSoftware.MauiMasonry.Core)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A lightweight, performant .NET MAUI control for building Pinterest-style staggered masonry grids on Android and iOS. Features deterministic aspect-ratio sizing, shortest-column-first placement, configurable column counts (2–4), smooth scrolling, and viewport item virtualization with view recycling.
 
