@@ -1,0 +1,159 @@
+<ContentPage
+    x:Class="MauiMasonry.Sample.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:masonry="http://schemas.truetechsoftware.com/dotnet/2026/mauimasonry"
+    xmlns:models="clr-namespace:MauiMasonry.Sample.Models"
+    xmlns:vm="clr-namespace:MauiMasonry.Sample.ViewModels"
+    x:DataType="vm:MainViewModel"
+    Title="MauiMasonry">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <VerticalStackLayout
+            Grid.Row="0"
+            Padding="12,10"
+            Spacing="8">
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <HorizontalStackLayout Grid.Column="0" Spacing="6">
+                    <Button
+                        Padding="12,6"
+                        BackgroundColor="{Binding TwoColumnsBackground}"
+                        Command="{Binding SetTwoColumnsCommand}"
+                        FontAttributes="Bold"
+                        FontSize="13"
+                        MinimumHeightRequest="36"
+                        MinimumWidthRequest="52"
+                        Text="2 Col"
+                        TextColor="{Binding TwoColumnsTextColor}" />
+                    <Button
+                        Padding="12,6"
+                        BackgroundColor="{Binding ThreeColumnsBackground}"
+                        Command="{Binding SetThreeColumnsCommand}"
+                        FontAttributes="Bold"
+                        FontSize="13"
+                        MinimumHeightRequest="36"
+                        MinimumWidthRequest="52"
+                        Text="3 Col"
+                        TextColor="{Binding ThreeColumnsTextColor}" />
+                    <Button
+                        Padding="12,6"
+                        BackgroundColor="{Binding FourColumnsBackground}"
+                        Command="{Binding SetFourColumnsCommand}"
+                        FontAttributes="Bold"
+                        FontSize="13"
+                        MinimumHeightRequest="36"
+                        MinimumWidthRequest="52"
+                        Text="4 Col"
+                        TextColor="{Binding FourColumnsTextColor}" />
+                </HorizontalStackLayout>
+
+                <Button
+                    Grid.Column="1"
+                    Padding="12,6"
+                    Command="{Binding ToggleEmptyStateCommand}"
+                    FontSize="13"
+                    MinimumHeightRequest="36"
+                    Text="{Binding EmptyToggleText}" />
+            </Grid>
+
+            <Label
+                FontSize="12"
+                Opacity="0.7"
+                Text="{Binding StatusSummary}" />
+        </VerticalStackLayout>
+
+        <RefreshView
+            Grid.Row="1"
+            Command="{Binding RefreshCommand}"
+            IsRefreshing="{Binding IsRefreshing}">
+
+            <masonry:MasonryView
+                Padding="12,4,12,16"
+                ColumnCount="{Binding ColumnCount}"
+                ColumnSpacing="10"
+                EmptyView="{Binding .}"
+                ItemsSource="{Binding Items}"
+                RowSpacing="10">
+
+                <masonry:MasonryView.ItemTemplate>
+                    <DataTemplate x:DataType="models:SamplePhotoItem">
+                        <Border
+                            Padding="12"
+                            BackgroundColor="{Binding CardColor}"
+                            StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="14" />
+                            </Border.StrokeShape>
+
+                            <Grid RowDefinitions="Auto,*,Auto">
+                                <Border
+                                    Grid.Row="0"
+                                    Padding="8,4"
+                                    BackgroundColor="{Binding BadgeColor}"
+                                    HorizontalOptions="Start"
+                                    StrokeThickness="0">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="8" />
+                                    </Border.StrokeShape>
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="11"
+                                        Text="{Binding Category}"
+                                        TextColor="White" />
+                                </Border>
+
+                                <VerticalStackLayout
+                                    Grid.Row="2"
+                                    Spacing="2"
+                                    VerticalOptions="End">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="15"
+                                        LineBreakMode="TailTruncation"
+                                        MaxLines="2"
+                                        Text="{Binding Title}"
+                                        TextColor="White" />
+                                    <Label
+                                        FontSize="11"
+                                        Opacity="0.85"
+                                        Text="{Binding AspectLabel}"
+                                        TextColor="White" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </masonry:MasonryView.ItemTemplate>
+
+                <masonry:MasonryView.EmptyViewTemplate>
+                    <DataTemplate x:DataType="vm:MainViewModel">
+                        <VerticalStackLayout
+                            Padding="32"
+                            HorizontalOptions="Center"
+                            Spacing="12"
+                            VerticalOptions="Center">
+                            <Label
+                                FontAttributes="Bold"
+                                FontSize="20"
+                                HorizontalTextAlignment="Center"
+                                Text="No Masonry Items" />
+                            <Label
+                                FontSize="14"
+                                HorizontalTextAlignment="Center"
+                                Opacity="0.7"
+                                Text="Pull down to refresh or tap below to populate variable-aspect-ratio cards." />
+                            <Button
+                                Command="{Binding PopulateCommand}"
+                                HorizontalOptions="Center"
+                                Text="Load Sample Items" />
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </masonry:MasonryView.EmptyViewTemplate>
+
+            </masonry:MasonryView>
+        </RefreshView>
+
+    </Grid>
+
+</ContentPage>

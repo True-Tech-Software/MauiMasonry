@@ -10,5 +10,6 @@
   </Folder>
   <Project Path="core/MauiMasonry.Core.csproj" />
   <Project Path="maui/MauiMasonry.csproj" />
+  <Project Path="sample/MauiMasonry.Sample.csproj" />
   <Project Path="tests/MauiMasonry.Tests.csproj" />
 </Solution>

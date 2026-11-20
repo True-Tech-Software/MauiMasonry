@@ -1,0 +1,13 @@
+<Shell
+    x:Class="MauiMasonry.Sample.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:MauiMasonry.Sample"
+    Title="MauiMasonry Sample">
+
+    <ShellContent
+        Title="MauiMasonry"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
+
+</Shell>
