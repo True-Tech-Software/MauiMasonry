@@ -30,10 +30,10 @@ jobs:
           dotnet-version: '11.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore MauiMasonry.slnx
+        run: dotnet restore tests/MauiMasonry.Tests.csproj
 
-      - name: Build solution
-        run: dotnet build MauiMasonry.slnx --configuration Release --no-restore -p:TreatWarningsAsErrors=true
+      - name: Build libraries and tests
+        run: dotnet build tests/MauiMasonry.Tests.csproj --configuration Release --no-restore -p:TreatWarningsAsErrors=true
 
       - name: Run unit tests
         run: dotnet test tests/MauiMasonry.Tests.csproj --configuration Release --no-build --verbosity normal
